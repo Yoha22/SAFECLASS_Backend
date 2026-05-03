@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  docente
+  coordinador
+  administrador
+}
+
+enum AlertType {
+  AGRESION
+  AISLAMIENTO
+  CAIDA
+  OTRO
+}
+
+enum AlertStatus {
+  PENDIENTE
+  CONFIRMADA
+  DESCARTADA
+}
+
+enum CameraStatus {
+  online
+  offline
+  error
+}
+
+enum ClassroomStatus {
+  active
+  alert
+  offline
+}
+
+enum ModuleStatus {
+  ok
+  warn
+  error
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role
+  active       Boolean   @default(true)
+  lastSession  DateTime?
+  createdAt    DateTime  @default(now())
+
+  alertActions    AlertAction[]
+  escalatedAlerts Alert[]       @relation("EscalatedTo")
+  resetTokens     PasswordResetToken[]
+  refreshTokens   RefreshToken[]
+}
+
+model Classroom {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  status    ClassroomStatus @default(active)
+  createdAt DateTime        @default(now())
+
+  cameras Camera[]
+  alerts  Alert[]
+}
+
+model Camera {
+  id          String       @id @default(uuid())
+  name        String
+  classroomId String
+  rtspUrl     String
+  active      Boolean      @default(true)
+  status      CameraStatus @default(offline)
+  fps         Int          @default(0)
+  resolution  String       @default("N/A")
+  lastCheck   DateTime?
+
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  alerts    Alert[]
+}
+
+model Alert {
+  id            String      @id @default(uuid())
+  type          AlertType
+  classroomId   String
+  cameraId      String
+  confidence    Float
+  status        AlertStatus @default(PENDIENTE)
+  notes         String?
+  discardReason String?
+  escalated     Boolean     @default(false)
+  escalatedToId String?
+  createdAt     DateTime    @default(now())
+  resolvedAt    DateTime?
+
+  classroom   Classroom    @relation(fields: [classroomId], references: [id])
+  camera      Camera       @relation(fields: [cameraId], references: [id])
+  escalatedTo User?        @relation("EscalatedTo", fields: [escalatedToId], references: [id])
+  actions     AlertAction[]
+}
+
+model AlertAction {
+  id        String   @id @default(uuid())
+  alertId   String
+  userId    String
+  action    String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  alert Alert @relation(fields: [alertId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
