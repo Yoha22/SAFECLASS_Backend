@@ -9,5 +9,6 @@ router.use(authenticate);
 router.get('/dashboard', ctrl.dashboard);
 router.get('/coordinator', requireRole('coordinador', 'administrador'), ctrl.coordinator);
 router.get('/system', requireRole('administrador'), ctrl.system);
+router.put('/threshold', requireRole('administrador'), ctrl.updateThreshold);
 
 export default router;

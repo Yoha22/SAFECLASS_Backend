@@ -73,7 +73,11 @@ export async function refreshAccessToken(refreshToken) {
     throw { status: 401, message: 'Refresh token inválido o expirado' };
   }
 
-  return { token: signAccess(stored.user) };
+  const u = stored.user;
+  return {
+    token: signAccess(u),
+    user: { id: u.id, name: u.name, email: u.email, role: u.role },
+  };
 }
 
 export async function logout(refreshToken) {

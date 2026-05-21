@@ -1,5 +1,6 @@
 import { cpus, totalmem, freemem } from 'os';
 import prisma from '../../config/database.js';
+import { env } from '../../config/env.js';
 
 export async function getDashboardStats() {
   const today = new Date();
@@ -127,6 +128,24 @@ function getCpuUsage() {
       resolve(total === 0 ? 0 : +(100 - (100 * idle) / total).toFixed(1));
     }, 200);
   });
+}
+
+export async function updateModelThreshold(threshold) {
+  const { url, apiKey } = env.modelService;
+  const headers = { 'Content-Type': 'application/json' };
+  if (apiKey) headers['X-API-Key'] = apiKey;
+
+  const res = await fetch(`${url}/config/threshold`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ threshold }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw { status: res.status, message: body.detail ?? 'Error al actualizar umbral en el modelo' };
+  }
+  return res.json();
 }
 
 function cpuSnapshot() {

@@ -11,6 +11,7 @@ import classroomsRoutes from './modules/classrooms/classrooms.routes.js';
 import camerasRoutes from './modules/cameras/cameras.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
 import statsRoutes from './modules/stats/stats.routes.js';
+import internalRoutes from './modules/internal/internal.routes.js';
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/classrooms', classroomsRoutes);
 app.use('/api/cameras', camerasRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/internal', internalRoutes);
 
 app.use(errorHandler);
 

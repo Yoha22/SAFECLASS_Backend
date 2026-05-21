@@ -22,4 +22,9 @@ export const env = {
     process.env.RESET_TOKEN_TTL_MINUTES ?? '30',
     10,
   ),
+
+  modelService: {
+    url:    process.env.MODEL_SERVICE_URL    ?? 'http://localhost:8001',
+    apiKey: process.env.MODEL_SERVICE_API_KEY ?? '',
+  },
 };
