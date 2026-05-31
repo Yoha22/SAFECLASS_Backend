@@ -13,7 +13,7 @@ export function unsubscribe(userId, res) {
 }
 
 export function broadcast(alert) {
-  const payload = `data: ${JSON.stringify(alert)}\n\n`;
+  const payload = `event: alert\ndata: ${JSON.stringify(alert)}\n\n`;
   for (const connections of subscribers.values()) {
     for (const res of connections) {
       res.write(payload);

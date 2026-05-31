@@ -24,6 +24,14 @@ export async function system(req, res, next) {
   }
 }
 
+export async function getThreshold(req, res, next) {
+  try {
+    res.json(await statsService.getModelThreshold());
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function updateThreshold(req, res, next) {
   try {
     const { threshold } = req.body ?? {};

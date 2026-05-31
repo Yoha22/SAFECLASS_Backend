@@ -7,6 +7,7 @@ const router = Router();
 
 router.use(authenticate);
 router.get('/', ctrl.list);
+router.post('/', requireRole('administrador'), ctrl.create);
 router.put('/:id', requireRole('administrador'), ctrl.update);
 router.post('/:id/test', requireRole('administrador'), ctrl.test);
 

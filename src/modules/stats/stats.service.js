@@ -130,6 +130,22 @@ function getCpuUsage() {
   });
 }
 
+export async function getModelThreshold() {
+  const config = await prisma.systemConfig.findUnique({ where: { key: 'confidence_threshold' } });
+  if (config) return { threshold: parseFloat(config.value) };
+
+  try {
+    const { url } = env.modelService;
+    const res = await fetch(`${url}/health`);
+    if (res.ok) {
+      const data = await res.json();
+      if (typeof data.threshold === 'number') return { threshold: data.threshold };
+    }
+  } catch {}
+
+  return { threshold: 0.75 };
+}
+
 export async function updateModelThreshold(threshold) {
   const { url, apiKey } = env.modelService;
   const headers = { 'Content-Type': 'application/json' };
@@ -145,6 +161,13 @@ export async function updateModelThreshold(threshold) {
     const body = await res.json().catch(() => ({}));
     throw { status: res.status, message: body.detail ?? 'Error al actualizar umbral en el modelo' };
   }
+
+  await prisma.systemConfig.upsert({
+    where: { key: 'confidence_threshold' },
+    update: { value: String(threshold) },
+    create: { key: 'confidence_threshold', value: String(threshold) },
+  });
+
   return res.json();
 }
 

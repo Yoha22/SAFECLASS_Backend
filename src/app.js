@@ -12,6 +12,7 @@ import camerasRoutes from './modules/cameras/cameras.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
 import statsRoutes from './modules/stats/stats.routes.js';
 import internalRoutes from './modules/internal/internal.routes.js';
+import adminVideoRoutes from './modules/admin/video.routes.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/cameras', camerasRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/internal', internalRoutes);
+app.use('/api/admin/video', adminVideoRoutes);
 
 app.use(errorHandler);
 

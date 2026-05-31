@@ -8,6 +8,16 @@ export async function getCameras() {
   });
 }
 
+export async function createCamera({ name, classroomId, rtspUrl }) {
+  const classroom = await prisma.classroom.findUnique({ where: { id: classroomId } });
+  if (!classroom) throw { status: 404, message: 'Salón no encontrado' };
+
+  return prisma.camera.create({
+    data: { name, classroomId, rtspUrl },
+    include: { classroom: { select: { id: true, name: true } } },
+  });
+}
+
 export async function updateCamera(id, data) {
   const camera = await prisma.camera.findUnique({ where: { id } });
   if (!camera) throw { status: 404, message: 'Cámara no encontrada' };
